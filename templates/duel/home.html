@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="arcade-card hero-card">
+    <div class="badge-tag">TODAY'S ARENA: {{ today|date:"M d, Y" }}</div>
+    <h1 class="glitch-title">{{ duel.title|default:"Arena Offline" }}</h1>
+    <p class="subtitle">3 rapid-fire questions. 60 seconds total. Speed determines your leaderboard bonus.</p>
+    
+    {% if duel %}
+    <div class="action-box">
+        <a href="{% url 'duel:play' %}" class="btn btn-primary pulse-btn">ENTER THE DUEL 🎮</a>
+    </div>
+    {% else %}
+    <p class="warning-text">No active duel scheduled for today. Run the seed script to launch!</p>
+    {% endif %}
+</div>
+
+<div class="arcade-card">
+    <h2 class="section-title">🏆 TODAY'S LEADERBOARD</h2>
+    {% if top_scores %}
+    <div class="table-wrapper">
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>RANK</th>
+                    <th>DUELIST</th>
+                    <th>ACCURACY</th>
+                    <th>TIME</th>
+                    <th>SCORE</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in top_scores %}
+                <tr class="{% if forloop.counter == 1 %}gold-row{% elif forloop.counter == 2 %}silver-row{% elif forloop.counter == 3 %}bronze-row{% endif %}">
+                    <td class="rank-col">#{{ forloop.counter }}</td>
+                    <td class="player-col"><strong>{{ entry.player_handle }}</strong></td>
+                    <td>{{ entry.correct_count }}/3</td>
+                    <td>{{ entry.time_taken_seconds }}s</td>
+                    <td class="score-col">{{ entry.final_score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <p class="empty-state">No duelists have entered today's arena yet. Be the first to claim #1!</p>
+    {% endif %}
+</div>
+{% endblock %}

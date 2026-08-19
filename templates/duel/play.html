@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="arcade-card play-card">
+    <!-- Player Handle Modal/Step -->
+    <div id="start-step" class="play-step">
+        <h2 class="section-title">CHOOSE YOUR HANDLE</h2>
+        <div class="input-group">
+            <input type="text" id="player-handle" class="arcade-input" placeholder="Enter arcade alias..." maxlength="20" autofocus>
+            <button id="start-btn" class="btn btn-primary">LAUNCH DUEL 🚀</button>
+        </div>
+    </div>
+
+    <!-- Live Game Screen -->
+    <div id="game-step" class="play-step" style="display: none;">
+        <div class="hud-bar">
+            <div class="hud-item">QUESTION: <span id="q-idx" class="highlight">1</span>/3</div>
+            <div class="hud-item">TIME: <span id="timer" class="timer-display">60.0s</span></div>
+            <div class="hud-item">CATEGORY: <span id="q-cat" class="category-pill">TECH</span></div>
+        </div>
+
+        <div class="timer-track">
+            <div id="timer-fill" class="timer-fill"></div>
+        </div>
+
+        <div class="question-container">
+            <h3 id="q-prompt" class="question-text">Loading question prompt...</h3>
+            <div class="options-grid">
+                <button class="opt-btn" data-opt="A"><span class="opt-letter">A</span> <span class="opt-text" id="opt-a"></span></button>
+                <button class="opt-btn" data-opt="B"><span class="opt-letter">B</span> <span class="opt-text" id="opt-b"></span></button>
+                <button class="opt-btn" data-opt="C"><span class="opt-letter">C</span> <span class="opt-text" id="opt-c"></span></button>
+                <button class="opt-btn" data-opt="D"><span class="opt-letter">D</span> <span class="opt-text" id="opt-d"></span></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading State -->
+    <div id="submitting-step" class="play-step" style="display: none;">
+        <h2 class="section-title">CALCULATING ARENA SCORE...</h2>
+        <div class="loader-pulse">⚡</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    const questions = JSON.parse('{{ questions_json|escapejs }}');
+    const duelId = {{ duel.id }};
+    const submitUrl = "{% url 'duel:submit' %}";
+    const csrfToken = "{{ csrf_token }}";
+
+    let currentIdx = 0;
+    let answers = {};
+    let startTime = null;
+    let timerInterval = null;
+    let handle = "Anonymous";
+
+    const startBtn = document.getElementById('start-btn');
+    const handleInput = document.getElementById('player-handle');
+    const startStep = document.getElementById('start-step');
+    const gameStep = document.getElementById('game-step');
+    const submittingStep = document.getElementById('submitting-step');
+
+    startBtn.addEventListener('click', () => {
+        handle = handleInput.value.trim() || 'Player_' + Math.floor(Math.random()*1000);
+        startStep.style.display = 'none';
+        gameStep.style.display = 'block';
+        startDuel();
+    });
+
+    function startDuel() {
+        startTime = performance.now();
+        renderQuestion(currentIdx);
+        
+        timerInterval = setInterval(() => {
+            const elapsed = (performance.now() - startTime) / 1000;
+            const remaining = Math.max(0, 60.0 - elapsed);
+            document.getElementById('timer').textContent = remaining.toFixed(1) + 's';
+            
+            const fillPct = (remaining / 60.0) * 100;
+            document.getElementById('timer-fill').style.width = fillPct + '%';
+            
+            if (remaining <= 0) {
+                clearInterval(timerInterval);
+                finishDuel();
+            }
+        }, 100);
+    }
+
+    function renderQuestion(idx) {
+        const q = questions[idx];
+        document.getElementById('q-idx').textContent = idx + 1;
+        document.getElementById('q-cat').textContent = q.category;
+        document.getElementById('q-prompt').textContent = q.prompt;
+        document.getElementById('opt-a').textContent = q.option_a;
+        document.getElementById('opt-b').textContent = q.option_b;
+        document.getElementById('opt-c').textContent = q.option_c;
+        document.getElementById('opt-d').textContent = q.option_d;
+
+        // Reset button states
+        document.querySelectorAll('.opt-btn').forEach(btn => {
+            btn.classList.remove('selected');
+            btn.disabled = false;
+        });
+    }
+
+    document.querySelectorAll('.opt-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const selectedOpt = btn.getAttribute('data-opt');
+            const q = questions[currentIdx];
+            answers[q.id] = selectedOpt;
+
+            btn.classList.add('selected');
+            document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+
+            setTimeout(() => {
+                currentIdx++;
+                if (currentIdx < questions.length) {
+                    renderQuestion(currentIdx);
+                } else {
+                    clearInterval(timerInterval);
+                    finishDuel();
+                }
+            }, 300);
+        });
+    });
+
+    async function finishDuel() {
+        gameStep.style.display = 'none';
+        submittingStep.style.display = 'block';
+
+        const totalTime = Math.min(60.0, (performance.now() - startTime) / 1000);
+
+        try {
+            const res = await fetch(submitUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrfToken,
+                },
+                body: JSON.stringify({
+                    duel_id: duelId,
+                    handle: handle,
+                    answers: answers,
+                    time_taken: totalTime,
+                })
+            });
+            const data = await res.json();
+            if (data.status === 'success') {
+                window.location.href = `/result/${data.attempt_id}/`;
+            } else {
+                alert('Submission error: ' + data.message);
+            }
+        } catch (err) {
+            alert('Failed to connect to arena server.');
+        }
+    }
+</script>
+{% endblock %}

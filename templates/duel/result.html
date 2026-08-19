@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="arcade-card result-hero">
+    <div class="badge-tag">DUEL REPORT</div>
+    <h1 class="score-display">{{ attempt.final_score }} <span class="pts">PTS</span></h1>
+    <p class="player-banner">DUELIST: <strong>{{ attempt.player_handle }}</strong></p>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <span class="stat-label">ACCURACY</span>
+            <span class="stat-val">{{ attempt.correct_count }} / 3</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">SPEED</span>
+            <span class="stat-val">{{ attempt.time_taken_seconds }}s</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">RANK</span>
+            <span class="stat-val highlight">#{{ rank }} / {{ total_players }}</span>
+        </div>
+        <div class="stat-card">
+            <span class="stat-label">PERCENTILE</span>
+            <span class="stat-val green">Top {{ percentile }}%</span>
+        </div>
+    </div>
+
+    <div class="action-box">
+        <a href="{% url 'duel:home' %}" class="btn btn-primary">VIEW FULL BOARD 🏆</a>
+    </div>
+</div>
+{% endblock %}
