@@ -1,5 +1,6 @@
 import json
 import time
+import random
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.views.decorators.http import require_POST
@@ -207,3 +208,17 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('duel:home')
+
+def get_or_create_daily_duel():
+    today = timezone.now().date()
+    duel, created = DailyDuel.objects.get_or_create(
+        duel_date=today,
+        defaults={'title': f"Cyber-Run Arena #{today.strftime('%j')}", 'is_active': True}
+    )
+    if created or duel.questions.count() < 3:
+        available = list(QuestionBank.objects.all())
+        if available:
+            selected = random.sample(available, min(3, len(available)))
+            duel.questions.set(selected)
+            duel.save()
+    return duel
