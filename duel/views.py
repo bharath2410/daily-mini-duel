@@ -14,21 +14,26 @@ def home_view(request):
     if duel:
         top_scores = DuelAttempt.objects.filter(duel=duel).order_by('-final_score', 'time_taken_seconds')[:10]
 
+    has_played = bool(request.session.get(f'played_{today}'))
+
     return render(request, 'duel/home.html', {
         'duel': duel,
         'top_scores': top_scores,
         'today': today,
+        'has_played': has_played,
     })
 
 
 def play_view(request):
     today = timezone.now().date()
-    duel = DailyDuel.objects.filter(duel_date=today, is_active=True).first()
+    # Block replay if already completed today
+    if request.session.get(f'played_{today}'):
+        return redirect('duel:home')
 
+    duel = DailyDuel.objects.filter(duel_date=today, is_active=True).first()
     if not duel or duel.questions.count() == 0:
         return redirect('duel:home')
 
-    # Serialize questions without revealing correct answer to client
     questions = list(
         duel.questions.values('id', 'category', 'prompt', 'option_a', 'option_b', 'option_c', 'option_d', 'order'))
 
@@ -40,11 +45,18 @@ def play_view(request):
 
 @require_POST
 def submit_attempt(request):
+    today = timezone.now().date()
+    session_key = f'played_{today}'
+
+    # Reject duplicate submissions for the day
+    if request.session.get(session_key):
+        return JsonResponse({'status': 'error', 'message': 'You have already completed today\'s duel.'}, status=403)
+
     try:
         data = json.loads(request.body)
         duel_id = data.get('duel_id')
         player_handle = data.get('handle', '').strip() or 'Anonymous Duelist'
-        answers = data.get('answers', {})  # Dict mapping str(question_id) -> 'A'/'B'/'C'/'D'
+        answers = data.get('answers', {})
         client_time = float(data.get('time_taken', 60.0))
 
         duel = get_object_or_404(DailyDuel, id=duel_id)
@@ -56,8 +68,6 @@ def submit_attempt(request):
             if user_choice and user_choice.upper() == q.correct_option:
                 correct_count += 1
 
-        # Arcade scoring: 1000 base pts per correct answer + time bonus decay
-        # Max bonus: 500 pts if finished within 5s, decaying to 0 at 60s
         time_bonus = max(0, int((60.0 - min(client_time, 60.0)) * 10))
         score = (correct_count * 1000) + (time_bonus if correct_count > 0 else 0)
 
@@ -70,6 +80,9 @@ def submit_attempt(request):
             user=request.user if request.user.is_authenticated else None
         )
 
+        # Lock this session for today
+        request.session[session_key] = True
+
         return JsonResponse({'status': 'success', 'attempt_id': attempt.id})
     except Exception as e:
         return JsonResponse({'status': 'error', 'message': str(e)}, status=400)
@@ -80,7 +93,6 @@ def result_view(request, attempt_id):
     duel = attempt.duel
     leaderboard = DuelAttempt.objects.filter(duel=duel).order_by('-final_score', 'time_taken_seconds')[:10]
 
-    # Calculate user's rank
     rank = DuelAttempt.objects.filter(duel=duel, final_score__gt=attempt.final_score).count() + 1
     total_players = DuelAttempt.objects.filter(duel=duel).count()
 
