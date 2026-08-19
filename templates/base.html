@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}Daily Mini-Duel | 60-Second Trivia Arena{% endblock %}</title>
     {% load static %}
 
@@ -44,18 +44,18 @@
     <footer class="main-footer">
         <p>New Duel rotates daily • Built with Django & Render</p>
     </footer>
-    {% block scripts %}{% endblock %}
 
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/static/sw.js')
-                    .then(reg => console.log('SW registered!'))
-                    .catch(err => console.log('SW registration failed: ', err));
+                    .then(() => console.log('PWA Service Worker registered'))
+                    .catch(err => console.log('SW registration error:', err));
             });
         }
     </script>
+
     {% block scripts %}{% endblock %}
 </body>
 </html>
