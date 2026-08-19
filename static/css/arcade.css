@@ -299,3 +299,66 @@ body {
     font-size: 0.8rem;
     color: var(--text-muted);
 }
+
+/* --- Header & Auth Navigation --- */
+.header-content {
+    max-width: 750px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px;
+}
+
+.auth-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.nav-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: #fff;
+}
+
+.nav-link.highlight {
+    background: rgba(59, 130, 246, 0.2);
+    color: var(--border-neon);
+    padding: 6px 14px;
+    border-radius: 6px;
+    border: 1px solid var(--border-neon);
+}
+
+.nav-link.highlight:hover {
+    background: var(--border-neon);
+    color: #fff;
+}
+
+.user-handle {
+    font-size: 0.85rem;
+    color: var(--neon-green);
+    font-weight: 700;
+}
+
+.played-banner {
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid var(--neon-green);
+    border-radius: 8px;
+    padding: 16px;
+    text-align: center;
+    margin-top: 16px;
+}
+
+.played-banner .subtext {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
