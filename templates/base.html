@@ -22,9 +22,6 @@
                 {% if user.is_authenticated %}
                     <span class="user-handle">👾 {{ user.username }}</span>
                     <a href="{% url 'duel:logout' %}" class="nav-link">LOGOUT</a>
-                {% else %}
-                    <a href="{% url 'duel:login' %}" class="nav-link">LOGIN</a>
-                    <a href="{% url 'duel:signup' %}" class="nav-link highlight">SIGN UP</a>
                 {% endif %}
             </div>
         </div>

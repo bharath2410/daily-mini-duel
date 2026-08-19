@@ -25,8 +25,21 @@
         </div>
     </div>
 
-    <div class="action-box">
-        <a href="{% url 'duel:home' %}" class="btn btn-primary">VIEW FULL BOARD 🏆</a>
+    {% if show_claim_box %}
+    <!-- High-converting post-game CTA for guests -->
+    <div class="claim-card">
+        <div class="claim-badge">SAVE YOUR STATS</div>
+        <h3>Lock in your score & build your daily streak</h3>
+        <p>Guest scores disappear on browser reset. Create an account in 10 seconds to claim your rank and permanent handle.</p>
+        <div class="claim-actions">
+            <a href="{% url 'duel:signup' %}" class="btn btn-primary pulse-btn">CLAIM SCORE & SIGN UP 🚀</a>
+            <a href="{% url 'duel:login' %}" class="nav-link">Already have an account? Log In</a>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="action-box" style="margin-top: 20px;">
+        <a href="{% url 'duel:home' %}" class="btn btn-secondary">VIEW ARENA LEADERBOARD 🏆</a>
     </div>
 </div>
 {% endblock %}
