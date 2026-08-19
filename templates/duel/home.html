@@ -4,14 +4,22 @@
 <div class="arcade-card hero-card">
     <div class="badge-tag">TODAY'S ARENA: {{ today|date:"M d, Y" }}</div>
     <h1 class="glitch-title">{{ duel.title|default:"Arena Offline" }}</h1>
-    <p class="subtitle">3 rapid-fire questions. 60 seconds total. Speed determines your leaderboard bonus.</p>
-    
+    <p class="subtitle">3 rapid-fire questions. 60 seconds total. Speed & accuracy determine your leaderboard rank.</p>
+
     {% if duel %}
-    <div class="action-box">
-        <a href="{% url 'duel:play' %}" class="btn btn-primary pulse-btn">ENTER THE DUEL 🎮</a>
-    </div>
+        {% if has_played %}
+            <div class="played-banner">
+                <span class="lock-icon">🔒</span>
+                <p><strong>You have completed today's duel!</strong></p>
+                <p class="subtext">Come back tomorrow at midnight UTC for the next arena rotation.</p>
+            </div>
+        {% else %}
+            <div class="action-box">
+                <a href="{% url 'duel:play' %}" class="btn btn-primary pulse-btn">ENTER THE DUEL 🎮</a>
+            </div>
+        {% endif %}
     {% else %}
-    <p class="warning-text">No active duel scheduled for today. Run the seed script to launch!</p>
+        <p class="warning-text">No active duel scheduled for today.</p>
     {% endif %}
 </div>
 

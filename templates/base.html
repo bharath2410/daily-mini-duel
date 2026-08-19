@@ -13,10 +13,21 @@
 <body>
     <div class="stars-bg"></div>
     <header class="main-header">
-        <a href="{% url 'duel:home' %}" class="logo">
-            <span class="logo-pixel">⚡ MINI-DUEL</span>
-            <span class="logo-badge">LIVE ARENA</span>
-        </a>
+        <div class="header-content">
+            <a href="{% url 'duel:home' %}" class="logo">
+                <span class="logo-pixel">⚡ MINI-DUEL</span>
+                <span class="logo-badge">LIVE ARENA</span>
+            </a>
+            <div class="auth-nav">
+                {% if user.is_authenticated %}
+                    <span class="user-handle">👾 {{ user.username }}</span>
+                    <a href="{% url 'duel:logout' %}" class="nav-link">LOGOUT</a>
+                {% else %}
+                    <a href="{% url 'duel:login' %}" class="nav-link">LOGIN</a>
+                    <a href="{% url 'duel:signup' %}" class="nav-link highlight">SIGN UP</a>
+                {% endif %}
+            </div>
+        </div>
     </header>
 
     <main class="container">
@@ -24,7 +35,7 @@
     </main>
 
     <footer class="main-footer">
-        <p>New Duel unlocks daily at midnight UTC • Built with Django & Render</p>
+        <p>New Duel rotates daily • Built with Django & Render</p>
     </footer>
     {% block scripts %}{% endblock %}
 </body>

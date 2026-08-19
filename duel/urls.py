@@ -8,4 +8,7 @@ urlpatterns = [
     path('play/', views.play_view, name='play'),
     path('submit/', views.submit_attempt, name='submit'),
     path('result/<int:attempt_id>/', views.result_view, name='result'),
+    path('signup/', views.signup_view, name='signup'),
+    path('login/', views.login_view, name='login'),
+    path('logout/', views.logout_view, name='logout'),
 ]
