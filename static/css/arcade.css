@@ -415,3 +415,124 @@ body {
     background: rgba(255, 255, 255, 0.2);
     border-color: #fff;
 }
+
+/* --- Authentication & Form Styling --- */
+.auth-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding: 20px 0;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 480px;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+
+.auth-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 24px;
+    letter-spacing: 0.5px;
+}
+
+.auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    text-align: left;
+}
+
+.form-label {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-main);
+    letter-spacing: 0.5px;
+}
+
+/* Style all default Django form inputs */
+.auth-form input[type="text"],
+.auth-form input[type="password"],
+.auth-form input[type="email"] {
+    width: 100%;
+    padding: 13px 16px;
+    background: rgba(10, 12, 22, 0.85);
+    border: 1.5px solid rgba(59, 130, 246, 0.35);
+    border-radius: 8px;
+    color: #fff;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.auth-form input[type="text"]:focus,
+.auth-form input[type="password"]:focus,
+.auth-form input[type="email"]:focus {
+    border-color: var(--border-neon);
+    box-shadow: 0 0 12px rgba(59, 130, 246, 0.35);
+}
+
+.help-text {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    line-height: 1.35;
+    margin-top: 2px;
+}
+
+.help-text ul {
+    margin-left: 18px;
+    margin-top: 4px;
+}
+
+.field-error {
+    color: #f87171;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
+.error-banner {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid #ef4444;
+    color: #fca5a5;
+    padding: 10px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.btn-block {
+    width: 100%;
+    text-align: center;
+    padding: 15px;
+    font-size: 1rem;
+    margin-top: 8px;
+}
+
+.auth-footer-links {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.back-link {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.85rem;
+    transition: color 0.2s ease;
+}
+
+.back-link:hover {
+    color: #fff;
+}
