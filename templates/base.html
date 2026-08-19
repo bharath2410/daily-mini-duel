@@ -5,6 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Daily Mini-Duel | 60-Second Trivia Arena{% endblock %}</title>
     {% load static %}
+
+    <!-- PWA & Mobile Meta Tags -->
+    <link rel="manifest" href="{% static 'manifest.json' %}">
+    <meta name="theme-color" content="#0a0c16">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Mini-Duel">
+    <link rel="apple-touch-icon" href="{% static 'img/icon-512.png' %}">
+
     <link rel="stylesheet" href="{% static 'css/arcade.css' %}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -34,6 +44,18 @@
     <footer class="main-footer">
         <p>New Duel rotates daily • Built with Django & Render</p>
     </footer>
+    {% block scripts %}{% endblock %}
+
+    <!-- Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(reg => console.log('SW registered!'))
+                    .catch(err => console.log('SW registration failed: ', err));
+            });
+        }
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>
